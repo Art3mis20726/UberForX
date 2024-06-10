@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { Cops}from "../models/cops.model.js";
 import ApiError from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -75,4 +76,42 @@ const loginUser=asyncHandler(async(req,res)=>{
 
 
 })
-export{registerUser,loginUser}
+const findNearestCop=asyncHandler(async(req,res)=>{
+    const{coor,maxdist}=req.body;
+    if (!Array.isArray(coor) || coor.length !== 2 || 
+    typeof coor[0] !== 'number' || typeof coor[1] !== 'number') {
+    throw new ApiError(400,"Invalid coordinates. Must be an array of two numbers.")
+}
+if(!maxdist){
+    throw new ApiError(400,"Max distance nont received")
+}
+    try {
+        const cop=await Cops.aggregate([
+            {
+            $geoNear:
+            {
+                near:
+                {
+                    type:"Point",
+                    coordinates:coor
+                },
+                distanceField:"distance",
+                maxDistance:maxdist,
+                spherical:true
+            }}
+            ,{$project:{
+                userId:1
+            }
+                
+    }])
+        return res.status(200).json(new ApiResponse(200,cop,"Nearest cop searched successfully"))
+    } catch (error) {
+        console.log(error)
+        throw new ApiError(400,"Error while finding the nearest cop",);
+    }
+
+
+
+
+})
+export{registerUser,loginUser,findNearestCop}

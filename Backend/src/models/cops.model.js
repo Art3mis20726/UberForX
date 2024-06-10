@@ -23,4 +23,5 @@ const copSchema = mongoose.Schema({
 	}
 
 },{timestamps:true})
+copSchema.index({ location: '2dsphere' });
 export const Cops=mongoose.model("Cops",copSchema)
