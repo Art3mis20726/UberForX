@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>OFFICER {{ userId }} </title>
+    <title>OFFICER {{ userId }}</title>
 </head>
 <body data-userId="{{ userId }}">
     <h1>Hello OFFICER {{ userId }}</h1>
@@ -14,30 +14,73 @@
     <div id="map">
         <!-- We will load a map here later-->
     </div>
+    <button onclick="helpCivilian()">
+        Help Civilian
+    </button>
+    
+    
+    <!-- Add a div for displaying cop details -->
+    <div id="copDetails">
+        <!-- Cop details will be displayed here -->
+    </div>
+
     <!-- Load socket.io client library -->
-<script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
-<!-- Load Axios from a CDN -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script type="text/javascript">
-    const socket = io();
+    <!-- Load Axios from a CDN -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    // Fetch userId from the data-atribute of the body tag
-    const userId = document.body.getAttribute("data-userId");
+    <script type="text/javascript">
+        const socket = io();
 
-    // Fire a 'join' event and send your userId to the server, to join a room - room-name will be the userId itself!
-    socket.emit("join", {userId: userId});
+        // Fetch userId from the data-attribute of the body tag
+        const userId = document.body.getAttribute("data-userId");
 
-    // Declare variables, this will be used later
-    let requestDetails = {};
-    let copDetails = {};
-    let map, marker;
-</script>
+        // Fire a 'join' event and send your userId to the server, to join a room - room-name will be the userId itself!
+        socket.emit("join", { userId: userId });
 
-    <!--Load JavaScripts -->
+        // Declare variables, this will be used later
+        let requestDetails = {};
+        let copDetails = {};
+        let map, marker;
+
+        // First send a GET request using Axios and get the cop's details and save it
+        axios.get(`/api/v1/cops/info?userId=${userId}`)
+            .then((response) => {
+                copDetails = response.data.data;
+                copDetails.location = {
+                    address: copDetails.location.address,
+                    longitude: copDetails.location.coordinates[0],
+                    latitude: copDetails.location.coordinates[1]
+                };
+
+                // Display cop details
+                document.getElementById("copDetails").innerHTML =
+                    `Display Name: ${copDetails.userId} <br>
+                    Address: ${copDetails.location.address}`;
+            })
+            .catch((error) => {
+                console.error('Error fetching cop details:', error);
+            });
+
+        // Listen for a "request-for-help" event
+        socket.on("request-for-help", (eventData) => {
+            // This function runs once a request-for-help event is received
+            requestDetails = eventData; // Contains info of civilian
+
+            // Display civilian info
+            
+            document.getElementById("notification").innerHTML =
+                `Civilian ${requestDetails.civilianId} is being attacked by a wildling and needs help!
+                They're at ${requestDetails.location.address}`;
+       });  
+        function helpCivilian(){
+            socket.emit("request-accepted",{
+                requestDetails:requestDetails,
+                copDetails:copDetails
+            }
+            )
+        }
+    </script>
 </body>
 </html>
-
-
-
-

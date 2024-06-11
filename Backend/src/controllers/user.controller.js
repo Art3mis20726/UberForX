@@ -76,8 +76,7 @@ const loginUser=asyncHandler(async(req,res)=>{
 
 
 })
-const findNearestCop=asyncHandler(async(req,res)=>{
-    const{coor,maxdist}=req.body;
+const findNearestCop=async function(coor,maxdist){
     if (!Array.isArray(coor) || coor.length !== 2 || 
     typeof coor[0] !== 'number' || typeof coor[1] !== 'number') {
     throw new ApiError(400,"Invalid coordinates. Must be an array of two numbers.")
@@ -104,7 +103,7 @@ if(!maxdist){
             }
                 
     }])
-        return res.status(200).json(new ApiResponse(200,cop,"Nearest cop searched successfully"))
+        return cop;
     } catch (error) {
         console.log(error)
         throw new ApiError(400,"Error while finding the nearest cop",);
@@ -113,5 +112,5 @@ if(!maxdist){
 
 
 
-})
+}
 export{registerUser,loginUser,findNearestCop}

@@ -31,4 +31,16 @@ const registerCop=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,copCreated,"Cop registered Successfully!!!"))
 
 })
-export{ registerCop}
+const copDetails=asyncHandler(async(req,res)=>{
+    const userId=req.query.userId;
+    if(!userId){
+        throw new ApiError(400,"UserId not found")
+    }
+    const cop=await Cops.findOne({userId},{userId:1,location:1});
+    if(!cop){ 
+        throw new ApiError(400,"Cop is not registered")
+    }
+    return res.status(200)
+    .json(new ApiResponse(200,cop,"Cop details fetched successfully"))
+})
+export{ registerCop,copDetails}

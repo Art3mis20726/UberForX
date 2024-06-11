@@ -1,5 +1,5 @@
 import Router from "express";
-import { registerCop } from "../controllers/cops.controller.js";
+import { copDetails, registerCop } from "../controllers/cops.controller.js";
 const router=Router()
 router.route("/registerCop").post(registerCop)//register cop
 router.get('/cop.html', (req, res) => {
@@ -7,5 +7,6 @@ router.get('/cop.html', (req, res) => {
         userId: req.query.userId
     });
 });
+router.route("/info").get(copDetails)
 
-export default router
+export default router 
