@@ -18,11 +18,11 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser())
 //For routing to the user routes
 app.set('views', 'views');// app to look for HTML files inside the views folder
-app.use(express.static('./public'));//sets the folder from which static assets like stylesheets and JavaScripts 
-app.set('view engine', 'html');//application to use the handlebars template engine to parse any html files.
+app.use('/images/cop.png', express.static('public/images/cop.png'));app.set('view engine', 'html');//application to use the handlebars template engine to parse any html files.
+app.use('/images/civilian.png', express.static('public/images/civilian.png'));app.set('view engine', 'html');//application to use the handlebars template engine to parse any html files.
 app.engine('html', consolidate.handlebars);
 import copRouter from "./routes/cops.routes.js"
 import userRouter from "./routes/user.routes.js"
-app.use("/api/v1/cops",copRouter)//For cops 
+app.use("/api/v1/cops",copRouter)//For cops  
 app.use("/api/v1/users",userRouter)
 export default app 

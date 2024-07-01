@@ -1,86 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <title>OFFICER {{ userId }}</title>
-</head>
-<body data-userId="{{ userId }}">
-    <h1>Hello OFFICER {{ userId }}</h1>
-
-    <h4 id="notification">
-        <!-- Some info will be displayed here-->
-    </h4>
-
-    <div id="map">
-        <!-- We will load a map here later-->
-    </div>
-    <button onclick="helpCivilian()">
-        Help Civilian
-    </button>
-    
-    
-    <!-- Add a div for displaying cop details -->
-    <div id="copDetails">
-        <!-- Cop details will be displayed here -->
-    </div>
-
-    <!-- Load socket.io client library -->
-    <script src="/socket.io/socket.io.js"></script>
-
-    <!-- Load Axios from a CDN -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-    <script type="text/javascript">
-        const socket = io();
-
-        // Fetch userId from the data-attribute of the body tag
-        const userId = document.body.getAttribute("data-userId");
-
-        // Fire a 'join' event and send your userId to the server, to join a room - room-name will be the userId itself!
-        socket.emit("join", { userId: userId });
-
-        // Declare variables, this will be used later
-        let requestDetails = {};
-        let copDetails = {};
-        let map, marker;
-
-        // First send a GET request using Axios and get the cop's details and save it
-        axios.get(`/api/v1/cops/info?userId=${userId}`)
-            .then((response) => {
-                copDetails = response.data.data;
-                copDetails.location = {
-                    address: copDetails.location.address,
-                    longitude: copDetails.location.coordinates[0],
-                    latitude: copDetails.location.coordinates[1]
-                };
-
-                // Display cop details
-                document.getElementById("copDetails").innerHTML =
-                    `Display Name: ${copDetails.userId} <br>
-                    Address: ${copDetails.location.address}`;
-            })
-            .catch((error) => {
-                console.error('Error fetching cop details:', error);
-            });
-
-        // Listen for a "request-for-help" event
-        socket.on("request-for-help", (eventData) => {
-            // This function runs once a request-for-help event is received
-            requestDetails = eventData; // Contains info of civilian
-
-            // Display civilian info
-            
-            document.getElementById("notification").innerHTML =
-                `Civilian ${requestDetails.civilianId} is being attacked by a wildling and needs help!
-                They're at ${requestDetails.location.address}`;
-       });  
-        function helpCivilian(){
-            socket.emit("request-accepted",{
-                requestDetails:requestDetails,
-                copDetails:copDetails
+    <head>
+        <meta charset="utf-8" />
+        <title>OFFICER {{ userId }}</title>
+        <style>
+            body { margin: 0; padding: 0; }
+            #map {
+                width: 100%; /* Set the desired width */
+                height: 600px; /* Set the desired height */
+                margin: 0 auto; /* Center the map horizontally */
             }
-            )
-        }
-    </script>
-</body>
+            #map > a { position: absolute; left: 10px; bottom: 10px; z-index: 999; }
+        </style>
+    
+        <!-- MapTiler SDK CSS -->
+        <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet">
+        <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
+        <!-- MapTiler SDK JavaScript -->
+     <link href="https://cdn.maptiler.com/maptiler-geocoding-control/v1.2.0/style.css" rel="stylesheet">
+        <script src="https://cdn.maptiler.com/maptiler-geocoding-control/v1.2.0/maptilersdk.umd.js"></script>
+
+    </head>
+    <body data-userId="{{ userId }}">
+        <h1>Hello OFFICER {{ userId }}</h1>
+
+        <h4 id="notification">
+            <!-- Some info will be displayed here-->
+        </h4>
+
+        <div id="map">
+            <!-- We will load a map here later-->
+        </div>
+        <button onclick="helpCivilian()">Help Civilian</button>
+
+        <!-- Add a div for displaying cop details -->
+        <div id="copDetails">
+            <!-- Cop details will be displayed here -->
+        </div>
+
+        <!-- Load socket.io client library -->
+        <script src="/socket.io/socket.io.js"></script>
+
+        <!-- Load Axios from a CDN -->
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <script type="text/javascript">
+            const socket = io();
+
+            // Fetch userId from the data-attribute of the body tag
+            const userId = document.body.getAttribute("data-userId");
+
+            // Fire a 'join' event and send your userId to the server, to join a room - room-name will be the userId itself!
+            socket.emit("join", { userId: userId });
+
+            // Declare variables, this will be used later
+            let requestDetails = {};
+            let copDetails = {};
+
+            // First send a GET request using Axios and get the cop's details and save it
+            axios
+                .get(`/api/v1/cops/info?userId=${userId}`)
+                .then((response) => {
+                    copDetails = response.data.data;
+                    copDetails.location = {
+                        address: copDetails.location.address,
+                        longitude: copDetails.location.coordinates[0],
+                        latitude: copDetails.location.coordinates[1],
+                    };
+                    maptilersdk.config.apiKey = 'V5KBiyYoOrA3dYHWLGOR';
+
+                    const map = (window.map = new maptilersdk.Map({
+                        container: 'map', // container's id or the HTML element to render the map
+                        style: maptilersdk.MapStyle.STREETS,  // stylesheet location
+                        zoom: 12,
+                        center: [copDetails.location.longitude, copDetails.location.latitude], // initial map center in [longitude, latitude]
+                    })); 
+                    let marker = new maptilersdk.Marker();
+                    marker.setLngLat([copDetails.location.longitude, copDetails.location.latitude])
+                    .addTo(map);
+                    // Display cop details
+                    document.getElementById("copDetails").innerHTML =
+                        `Display Name: ${copDetails.userId} <br>
+                    Address: ${copDetails.location.address}`;
+                })
+                .catch((error) => {
+                    console.error("Error fetching cop details:", error);
+                });
+
+            // Listen for a "request-for-help" event
+            socket.on("request-for-help", (eventData) => {
+                // This function runs once a request-for-help event is received
+                requestDetails = eventData; // Contains info of civilian
+                let marker1 = new maptilersdk.Marker();
+marker1.setLngLat([requestDetails.location.longitude, requestDetails.location.latitude],marker1.getElement().innerHTML = `<img src="/images/civilian.png" style="width: 60px; height: 40px;">`           
+)
+
+.addTo(map);
+
+
+                // Display civilian info
+
+                document.getElementById("notification").innerHTML =
+                    `Civilian ${requestDetails.civilianId} is being attacked by a wildling and needs help!
+                They're at ${requestDetails.location.address}`;
+            });
+            function helpCivilian() {
+                socket.emit("request-accepted", {
+                    requestDetails: requestDetails,
+                    copDetails: copDetails,
+                });
+            }
+         
+           
+
+        </script>
+    </body>
 </html>
