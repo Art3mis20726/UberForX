@@ -6,6 +6,7 @@ import {
 } from "./src/controllers/request.controller.js";
 import ApiError from "./src/utils/apiError.js";
 import { findNearestCop } from "./src/controllers/user.controller.js";
+import { log } from "console";
 const require = createRequire(import.meta.url);
 const socketIO = require("socket.io");
 
@@ -45,6 +46,7 @@ const initialize = function (server) {
                     location.coordinates,
                     5000
                 );
+                console.log(location.coordinates)
                 if (!nearestCop) {
                     throw new ApiError(400, "Narest cop not found!!!");
                 }

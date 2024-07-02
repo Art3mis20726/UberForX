@@ -40,16 +40,18 @@
         let copDetails = {};
         let lan=12.976;
         let lat=77.609;
-        requestDetails = {
-            civilianId: userId,
-            location: {
-                address: "Indiranagar, Bengaluru, Karnataka, India",
-                latitude: lan,
-                longitude: lat,
-            },
-        };
-
+        
         function requestForHelp() {
+            requestDetails = {
+                civilianId: userId,
+                location: {
+                    address: "India",
+                    latitude: lan,
+                    longitude: lat,
+                },
+            };
+            console.log("Lat: ",lat);
+            console.log("Lan: ",lan);
             socket.emit("request-for-help", requestDetails);
         }
 
@@ -93,9 +95,9 @@
             // Update marker position
             lan=location[0][0];
             lat=location[0][1];
-            marker.setLngLat([lan,lat]);
+            marker.setLngLat([lan,lat]).addTo(map);;
             // Optionally, update requestDetails.location here
-            });
+            })
             
             map.addControl(gc, 'top-left');
             // Add geocoding control to the map
