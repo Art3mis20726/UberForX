@@ -38,13 +38,14 @@
         socket.emit("join", { userId: userId });
         let requestDetails = {};
         let copDetails = {};
-
+        let lan=12.976;
+        let lat=77.609;
         requestDetails = {
             civilianId: userId,
             location: {
                 address: "Indiranagar, Bengaluru, Karnataka, India",
-                latitude: 13.02,
-                longitude: 77.639,
+                latitude: lan,
+                longitude: lat,
             },
         };
 
@@ -80,10 +81,11 @@
 
         // Initialize marker with default position
         let marker = new maptilersdk.Marker()
-            .setLngLat([77.609, 12.976])
+            .setLngLat([lat, lan])
             .addTo(map);
 
         // Initialize the geocoding control
+       
 
         const gc = new maptilersdkMaptilerGeocoder.GeocodingControl();        // Add event listener for the geocoding result selected event
         gc.addEventListener('pick', function (e) {

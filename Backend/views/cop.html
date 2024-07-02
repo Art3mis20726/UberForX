@@ -4,22 +4,35 @@
         <meta charset="utf-8" />
         <title>OFFICER {{ userId }}</title>
         <style>
-            body { margin: 0; padding: 0; }
+            body {
+                margin: 0;
+                padding: 0;
+            }
             #map {
                 width: 100%; /* Set the desired width */
                 height: 600px; /* Set the desired height */
                 margin: 0 auto; /* Center the map horizontally */
             }
-            #map > a { position: absolute; left: 10px; bottom: 10px; z-index: 999; }
+            #map > a {
+                position: absolute;
+                left: 10px;
+                bottom: 10px;
+                z-index: 999;
+            }
         </style>
-    
+
         <!-- MapTiler SDK CSS -->
-        <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet">
+        <link
+            href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css"
+            rel="stylesheet"
+        />
         <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
         <!-- MapTiler SDK JavaScript -->
-     <link href="https://cdn.maptiler.com/maptiler-geocoding-control/v1.2.0/style.css" rel="stylesheet">
+        <link
+            href="https://cdn.maptiler.com/maptiler-geocoding-control/v1.2.0/style.css"
+            rel="stylesheet"
+        />
         <script src="https://cdn.maptiler.com/maptiler-geocoding-control/v1.2.0/maptilersdk.umd.js"></script>
-
     </head>
     <body data-userId="{{ userId }}">
         <h1>Hello OFFICER {{ userId }}</h1>
@@ -67,17 +80,24 @@
                         longitude: copDetails.location.coordinates[0],
                         latitude: copDetails.location.coordinates[1],
                     };
-                    maptilersdk.config.apiKey = 'V5KBiyYoOrA3dYHWLGOR';
+                    maptilersdk.config.apiKey = "V5KBiyYoOrA3dYHWLGOR";
 
                     const map = (window.map = new maptilersdk.Map({
-                        container: 'map', // container's id or the HTML element to render the map
-                        style: maptilersdk.MapStyle.STREETS,  // stylesheet location
+                        container: "map", // container's id or the HTML element to render the map
+                        style: maptilersdk.MapStyle.STREETS, // stylesheet location
                         zoom: 12,
-                        center: [copDetails.location.longitude, copDetails.location.latitude], // initial map center in [longitude, latitude]
-                    })); 
+                        center: [
+                            copDetails.location.longitude,
+                            copDetails.location.latitude,
+                        ], // initial map center in [longitude, latitude]
+                    }));
                     let marker = new maptilersdk.Marker();
-                    marker.setLngLat([copDetails.location.longitude, copDetails.location.latitude])
-                    .addTo(map);
+                    marker
+                        .setLngLat([
+                            copDetails.location.longitude,
+                            copDetails.location.latitude,
+                        ])
+                        .addTo(map);
                     // Display cop details
                     document.getElementById("copDetails").innerHTML =
                         `Display Name: ${copDetails.userId} <br>
@@ -92,11 +112,15 @@
                 // This function runs once a request-for-help event is received
                 requestDetails = eventData; // Contains info of civilian
                 let marker1 = new maptilersdk.Marker();
-marker1.setLngLat([requestDetails.location.longitude, requestDetails.location.latitude],marker1.getElement().innerHTML = `<img src="/images/civilian.png" style="width: 60px; height: 40px;">`           
-)
-
-.addTo(map);
-
+                marker1
+                    .setLngLat(
+                        [
+                            requestDetails.location.longitude,
+                            requestDetails.location.latitude,
+                        ],
+                        (marker1.getElement().innerHTML = `<img src="/images/civilian.png" style="width: 60px; height: 40px;">`)
+                    )
+                    .addTo(map);
 
                 // Display civilian info
 
@@ -110,9 +134,6 @@ marker1.setLngLat([requestDetails.location.longitude, requestDetails.location.la
                     copDetails: copDetails,
                 });
             }
-         
-           
-
         </script>
     </body>
 </html>
