@@ -76,6 +76,10 @@ const loginUser=asyncHandler(async(req,res)=>{
 
 
 })
+const logOutUser=asyncHandler(async(req,res)=>{
+    const accessToken=req.cookies.accessToken;
+    
+})
 const findNearestCop=async function(coor,maxdist){
     if (!Array.isArray(coor) || coor.length !== 2 || 
     typeof coor[0] !== 'number' || typeof coor[1] !== 'number') {
